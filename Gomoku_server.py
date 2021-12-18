@@ -24,6 +24,29 @@ class Gomoku:
         self.end = False
         self.reset = False
         self.winSide = -1
+        self.player = 0
+
+    def get_color_list(self):
+        list = self.color
+        return list
+
+    def get_player(self):
+        player = self.player
+        return player
+
+    def set_player(self, cmd):
+        if self.player <= 2:
+            if cmd == True:
+                self.lock.acquire()
+                self.player += 1
+                self.lock.release()
+            elif cmd == False:
+                self.lock.acquire()
+                self.player -= 1
+                self.lock.release()
+            return True
+        elif self.player > 2:
+            return False
 
     def set_host_false(self):
         self.lock.acquire()
@@ -32,7 +55,7 @@ class Gomoku:
         self.lock.release()
         return True
 
-    def quit(self, color):
+    def putColorBack(self, color):
         print("color list: " + str(self.color))
         self.lock.acquire()
         self.color.append(color)
@@ -85,6 +108,7 @@ class Gomoku:
     # 隨機分配棋子顏色
 
     def get_color(self):
+        print('=====# length of color = %d' % (len(self.color)))
         if len(self.color) == 2:  # 尚未分配任何一個棋子
             randnum = random.randint(0, 1)
             tmp = self.color[randnum]
@@ -95,10 +119,10 @@ class Gomoku:
         elif len(self.color) == 1:  # 已分配一個顏色
             tmp = self.color[0]
             self.lock.acquire()
-            self.color.remove(tmp)  # 從list移除該顏色，之後color list為空
+            self.color.remove(self.color[0])  # 從list移除該顏色，之後color list為空
             self.lock.release()
             return tmp
-        else:  # 沒有顏色可以分配(color list為空)
+        else:
             return False
 
     # 根據player的顏色落棋
@@ -234,7 +258,7 @@ class Gomoku:
         self.lock.acquire()
         self.chess_pos.clear()
         self.winSide = -1
-        self.color = [white, black]
+        # self.color = [white, black]
         self.reset = True
         self.lock.release()
         return True

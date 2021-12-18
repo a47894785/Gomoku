@@ -15,6 +15,7 @@ black = [0, 0, 0]
 white = [255, 255, 255]
 button_on = [176, 196, 222]
 button_off = [119, 136, 153]
+color = []
 # flags
 clicked = False
 press_flag = 0
@@ -34,12 +35,12 @@ text_password = ""  # 存入密碼
 
 
 class Player():
-    def __init__(self, id, name, ip, port, color):
+    def __init__(self, id, name, ip, port):
         self.id = id
         self.name = name
         self.ip = ip
         self.port = port
-        self.color = color  # 棋子顏色
+        self.color = []  # 棋子顏色
         self.is_host = False  # 是否為房主
 
     def posInfo(self, x, y):
@@ -55,10 +56,6 @@ class Player():
 
     def set_host(self, isHost):
         self.is_host = isHost
-
-    def get_color(self):
-        color = self.color
-        return color
 
     def set_color(self, color):
         self.color = color
@@ -119,36 +116,46 @@ class Player():
         if side == 0:
             text = font.render('BLACK WIN', True, black)
         elif side == 1:
-            text = font.render('WIHTE WIN', True, white)
+            text = font.render('WHITE WIN', True, white)
         win.blit(text, (670, 400))
 
 
 def main():
-    global chess_pos, clicked, press_flag, press_flag1
+    global chess_pos, clicked, press_flag, press_flag1, color
     if (len(sys.argv) < 3):
         print('Usage: python Gomoku_client.py ServerIP name')
         exit(1)
     server = xmlrpc.client.ServerProxy(
         'http://' + sys.argv[1] + ':' + str(PORT))
     run = True
-    color = server.get_color()  # 從伺服器取得棋子顏色
+    # if color == []:
+    #     color = server.get_color()  # 從伺服器取得棋子顏色
+    # print('$$$ Color = ' + str(color))
     # is_host = server.is_host(sys.argv[2])  # 伺服器回傳是否為房主
     # if is_host:
     #     print('You are the room host')
     # 伺服器回傳False表示已滿兩人
-    if color == False:
-        print('Room is full')
-        exit(1)
-    print(color)
+    # if color == False:
+    #     print('Room is full')
+    #     exit(1)
+    # print(color)
     # 印出黑色或白色方
-    if color == white:
-        print('You are white side')
-    else:
-        print('You are black side')
+    # if color == white:
+    #     print('You are white side')
+    # else:
+    #     print('You are black side')
     pygame.init()
     # 建立物件
-    player = Player('abcd', sys.argv[2], '127.0.0.1', 8888, color)
-
+    player = Player('abcd', sys.argv[2], '127.0.0.1', 8888)
+    print('server color list: ' + str(server.get_color_list()))
+    # print('player.color = ' + str(player.get_color()))
+    # 房間人數+1
+    num = server.set_player(True)
+    if not num:
+        print('Room is full')
+        sys.exit()
+    color = server.get_color()
+    player.set_color(color)
     run_write = True
     win_temp.fill(win_color)
     global text, text_password, text_username
@@ -180,10 +187,14 @@ def main():
     while run:
         for event in pygame.event.get():
             if event.type == QUIT:
-                quit = server.quit(player.get_color())
+                quit = server.putColorBack(player.get_color())
+                print('put ' + str(player.get_color()) + ' back')
                 print(quit)
                 if player.is_host:
                     server.set_host_false()
+                    player.is_host = False
+                print("---------> player : %d" % (server.get_player()))
+                server.set_player(False)
                 sys.exit()
             elif event.type == MOUSEBUTTONDOWN:
                 clicked = True
@@ -230,16 +241,21 @@ def main():
                     press_flag = 1
         # Restart 按鈕
         elif 700 <= x <= 800 and 200 <= y <= 250:
+            # 房主可按下重新開始
             if player.get_isHost() and clicked and press_flag1 == 0:
                 if server.game_reset():
                     server.game_end(False)
+                    server.putColorBack(player.get_color())
                     color = server.get_color()
+                    player.set_color(color)
                     print('Restart')
                 press_flag1 = 1
         if player.get_isHost() == False:
+            server.putColorBack(player.get_color())
             color = server.get_color()
         if color:
             player.set_color(color)
+
         pygame.display.update()
 
 
