@@ -1,13 +1,17 @@
+from os import name
+from sys import setswitchinterval
 from xmlrpc.server import SimpleXMLRPCServer
 from socketserver import ThreadingMixIn
 import time
 import threading
 import numpy as np
 import random
-
+from flask import Flask, json, request, jsonify
 PORT = 8888
 white = [255, 255, 255]
 black = [0, 0, 0]
+FILE1 = 'people.json'
+ARR1 = []
 
 
 class ThreadXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
@@ -56,11 +60,9 @@ class Gomoku:
         return True
 
     def putColorBack(self, color):
-        print("color list: " + str(self.color))
         self.lock.acquire()
         self.color.append(color)
         self.lock.release()
-        print("color list: " + str(self.color))
         return True
 
     def get_reset(self):
@@ -74,6 +76,7 @@ class Gomoku:
         end = self.end
         return end
 
+    # 回傳棋局是否結束
     def is_end(self):
         end = self.end
         return end
@@ -108,7 +111,6 @@ class Gomoku:
     # 隨機分配棋子顏色
 
     def get_color(self):
-        print('=====# length of color = %d' % (len(self.color)))
         if len(self.color) == 2:  # 尚未分配任何一個棋子
             randnum = random.randint(0, 1)
             tmp = self.color[randnum]
@@ -119,10 +121,10 @@ class Gomoku:
         elif len(self.color) == 1:  # 已分配一個顏色
             tmp = self.color[0]
             self.lock.acquire()
-            self.color.remove(self.color[0])  # 從list移除該顏色，之後color list為空
+            self.color.remove(tmp)  # 從list移除該顏色，之後color list為空
             self.lock.release()
             return tmp
-        else:
+        else:  # 沒有顏色可以分配(color list為空)
             return False
 
     # 根據player的顏色落棋
@@ -252,19 +254,44 @@ class Gomoku:
                         self.lock.release()
                         return [2, pos2]
         return [0, []]
-
     # 重新開始棋局，清空chess_pos並將winSide設回初始值
+
     def game_reset(self):
         self.lock.acquire()
         self.chess_pos.clear()
         self.winSide = -1
-        # self.color = [white, black]
         self.reset = True
         self.lock.release()
         return True
 
+    def add_new_user(self, dict):
+        if(dict["username"] == "") | (dict["password"] == ""):
+            return False
+        ARR1.append(dict)
+        with open(FILE1, 'w') as wfp1:
+            json.dump(ARR1, wfp1)
+        print(ARR1)
+        return True
+
+    def identify_user(self, dict):
+        flag = False
+        for i in range(len(ARR1)):
+            if dict["username"] == (ARR1[i]['username']):
+                if dict["password"] == ARR1[i]["password"]:
+                    return "ok"
+                else:
+                    return "pass"
+                flag = True
+                break
+        if flag == False:
+            return "name"
+
 
 def main():
+    global ARR1
+    # load JSON file
+    with open(FILE1) as fp1:
+        ARR1 = json.load(fp1)
     obj = Gomoku()
     server = ThreadXMLRPCServer(('', PORT))
     server.register_instance(obj)
