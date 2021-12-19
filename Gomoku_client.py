@@ -190,7 +190,7 @@ def main():
                 quit = server.putColorBack(player.get_color())
                 print('put ' + str(player.get_color()) + ' back')
                 print(quit)
-                if player.is_host:
+                if player.get_isHost():
                     server.set_host_false()
                     player.is_host = False
                 print("---------> player : %d" % (server.get_player()))
