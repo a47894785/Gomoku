@@ -28,7 +28,7 @@ chess_pos = []
 # 建立pygame視窗
 win = pygame.display.set_mode((width, height))
 win_temp = pygame.display.set_mode((width, height))
-win_start = pygame.display.set_mode((500, 500))
+win_start = pygame.display.set_mode((900, 600))
 pygame.display.set_caption('Gomoku Client')
 # Restart矩形
 rect1 = pygame.Rect(700, 200, 100, 50)
@@ -171,7 +171,6 @@ def main():
     global text_create, text_log, text_password, text_username, text_warning
     index = 0
     while(run_system):
-        win_start = pygame.display.set_mode((500, 500))
         win_start.fill(win_color)
         pygame.draw.rect(win_start, button_on, rec_new_user)
         pygame.draw.rect(win_start, button_on, rec_log_in)
@@ -196,7 +195,6 @@ def main():
             x, y = pygame.mouse.get_pos()
             if clicked and press_flag == 0:
                 if 50 <= x <= 450 and 50 <= y <= 150:  # 進入新增帳號介面
-                    win_start = pygame.display.set_mode((900, 600))
                     win_start.fill(win_color)
                     pygame.display.update()
                     run_write = True
@@ -307,7 +305,6 @@ def main():
                                     index = 0  # 此行讓index為0是因為若不為0，迴圈又會再跑一次接著又出現提醒的字眼，防止再出現
                                     # 等待幾秒後，再把提醒字眼給覆蓋掉
                 elif 50 <= x <= 450 and 200 <= y <= 300:  # 進入登入帳號介面(基本上和新增差不多)
-                    win_start = pygame.display.set_mode((900, 600))
                     win_start.fill(win_color)
                     pygame.display.update()
                     run_identify = True
