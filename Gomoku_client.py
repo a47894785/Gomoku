@@ -131,6 +131,12 @@ class Player():
             text = font.render('WIHTE WIN', True, white)
         win.blit(text, (670, 400))
 
+    def message(self, situation):
+        font = pygame.font.SysFont("", 35)
+        if situation == 'turnError':
+            turnErr = font.render('Not Your Turn!', True, black)
+        win.blit(turnErr, (670, 60))
+
 
 def main():
     global chess_pos, clicked, press_flag, color, press_flag1
@@ -473,6 +479,8 @@ def main():
                                                             print(
                                                                 'Drop chess in [%d, %d]' % (x0, y0))
                                                         else:
+                                                            player.message(
+                                                                'turnError')
                                                             print(
                                                                 'Not your turn')
                                                     press_flag = 1
