@@ -30,6 +30,12 @@ class Gomoku:
         self.winSide = -1
         self.player = 0
 
+    def chess_reset(self):
+        self.lock.acquire()
+        self.chess_pos.clear()
+        self.lock.release()
+        return True
+
     def get_color_list(self):
         list = self.color
         return list

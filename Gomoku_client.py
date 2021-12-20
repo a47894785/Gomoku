@@ -430,6 +430,7 @@ def main():
                                                 print("---------> player : %d" %
                                                       (server.get_player()))
                                                 server.set_player(False)
+                                                chessReset = server.chess_reset()
                                                 sys.exit()
                                             elif event.type == MOUSEBUTTONDOWN:
                                                 clicked = True
