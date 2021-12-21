@@ -156,12 +156,12 @@ def main():
     # 建立物件
     player = Player('abcd', sys.argv[2], '127.0.0.1', 8888)
     print('server color list: ' + str(server.get_color_list()))
-    num = server.set_player(True)
-    if not num:
-        print('Room is full.')
-        sys.exit()
-    color = server.get_color()
-    player.set_color(color)
+    # num = server.set_player(True)
+    # if not num:
+    #     print('Room is full.')
+    #     sys.exit()
+    # color = server.get_color()
+    # player.set_color(color)
     run_system = True
     run_write = False
     run_identify = False
@@ -414,91 +414,98 @@ def main():
                                     text_password = ""
                                     run_identify = False
                                     run = True
-                                    while run:
-                                        for event in pygame.event.get():
-                                            if event.type == QUIT:
-                                                quit = server.putColorBack(
-                                                    player.get_color())
-                                                print(
-                                                    'Put ' + str(player.get_color()) + ' back.')
-                                                print(quit)
-                                                if player.get_isHost():
-                                                    server.set_host_false()
-                                                    player.set_host(False)
-                                                print("---------> player : %d" %
-                                                      (server.get_player()))
-                                                server.set_player(False)
-                                                chessReset = server.chess_reset()
-                                                sys.exit()
-                                            elif event.type == MOUSEBUTTONDOWN:
-                                                clicked = True
-                                            elif event.type == MOUSEBUTTONUP:
-                                                clicked = False
-                                                press_flag = 0  # 棋盤上
-                                                press_flag1 = 0  # Restart
-                                        is_host = server.is_host(sys.argv[2])
-                                        player.set_host(is_host)
-                                        player.drawChessBoard()  # 繪製棋盤
-                                        chess_pos = server.get_chess_pos()  # 取得棋子位置
-                                        player.drawChess()  # 繪製棋子
-                                        result = server.check_win()  # 判斷勝負
-                                        winSide = server.get_winSide()  # 取得勝利方 init = -1, black = 0, white = 1
-                                        # 若有一方勝利且棋局尚未結束，先將棋局結束後印出勝利方
-                                        if winSide != -1 and not server.is_end():
-                                            if winSide == 0:
-                                                print('Black Win')
-                                            else:
-                                                print('White Win')
-                                            if is_host:  # 若是房主則向伺服器請求將棋局結束
-                                                server.game_end(True)
-                                        if winSide != -1:
-                                            player.printWin(winSide)
-                                        # 取得滑鼠座標
-                                        x, y = pygame.mouse.get_pos()
-                                        if x <= 600:  # 在棋盤範圍內
-                                            x0, y0 = player.posInfo(x, y)
-                                            if player.check_pos(x0, y0):
-                                                pygame.draw.rect(win, [255, 0, 0], [
-                                                                 x0 - 20, y0 - 20, 40, 40], 2, 1)
-
-                                        chess_pos = server.get_chess_pos()  # 取得棋子位置
-                                        if x <= 600:  # 在棋盤範圍內
-                                            if not server.is_end():
-                                                if clicked and press_flag == 0:
-                                                    if player.check_pos(x0, y0):
-                                                        # 根據棋子顏色判斷是否為我方下棋
-                                                        if (server.dropChess(x0, y0, player.get_color())):
-                                                            print(
-                                                                'Drop chess in [%d, %d]' % (x0, y0))
-                                                        else:
-                                                            msg_flag = 1
-                                                            delay = 50
-                                                            print(
-                                                                'Cannot drop chess')
-                                                    press_flag = 1
-
-                                        # msg
-                                        if msg_flag == 1 and delay > 0:
-                                            player.message('turnError')
-                                            delay -= 1
-                                        # Restart 按鈕
-                                        elif 700 <= x <= 800 and 200 <= y <= 250:
-                                            if player.get_isHost() and clicked and press_flag1 == 0:
-                                                if server.game_reset():
-                                                    server.game_end(False)
-                                                    server.putColorBack(
+                                    num = server.set_player(True)
+                                    if not num:
+                                        print('Room is full')
+                                    else:
+                                        color = server.get_color()
+                                        player.set_color(color)
+                                        while run:
+                                            for event in pygame.event.get():
+                                                if event.type == QUIT:
+                                                    quit = server.putColorBack(
                                                         player.get_color())
-                                                    color = server.get_color()
-                                                    player.set_color(color)
-                                                    print('Restart')
-                                                press_flag1 = 1
-                                        if player.get_isHost() == False:
-                                            server.putColorBack(
-                                                player.get_color())
-                                            color = server.get_color()
-                                        if color:
-                                            player.set_color(color)
-                                        pygame.display.update()
+                                                    print(
+                                                        'Put ' + str(player.get_color()) + ' back.')
+                                                    print(quit)
+                                                    if player.get_isHost():
+                                                        server.set_host_false()
+                                                        player.set_host(False)
+                                                    print("---------> player : %d" %
+                                                          (server.get_player()))
+                                                    server.set_player(False)
+                                                    chessReset = server.chess_reset()
+                                                    sys.exit()
+                                                elif event.type == MOUSEBUTTONDOWN:
+                                                    clicked = True
+                                                elif event.type == MOUSEBUTTONUP:
+                                                    clicked = False
+                                                    press_flag = 0  # 棋盤上
+                                                    press_flag1 = 0  # Restart
+                                            is_host = server.is_host(
+                                                sys.argv[2])
+                                            player.set_host(is_host)
+                                            player.drawChessBoard()  # 繪製棋盤
+                                            chess_pos = server.get_chess_pos()  # 取得棋子位置
+                                            player.drawChess()  # 繪製棋子
+                                            result = server.check_win()  # 判斷勝負
+                                            winSide = server.get_winSide()  # 取得勝利方 init = -1, black = 0, white = 1
+                                            # 若有一方勝利且棋局尚未結束，先將棋局結束後印出勝利方
+                                            if winSide != -1 and not server.is_end():
+                                                if winSide == 0:
+                                                    print('Black Win')
+                                                else:
+                                                    print('White Win')
+                                                if is_host:  # 若是房主則向伺服器請求將棋局結束
+                                                    server.game_end(True)
+                                            if winSide != -1:
+                                                player.printWin(winSide)
+                                            # 取得滑鼠座標
+                                            x, y = pygame.mouse.get_pos()
+                                            if x <= 600:  # 在棋盤範圍內
+                                                x0, y0 = player.posInfo(x, y)
+                                                if player.check_pos(x0, y0):
+                                                    pygame.draw.rect(win, [255, 0, 0], [
+                                                        x0 - 20, y0 - 20, 40, 40], 2, 1)
+
+                                            chess_pos = server.get_chess_pos()  # 取得棋子位置
+                                            if x <= 600:  # 在棋盤範圍內
+                                                if not server.is_end():
+                                                    if clicked and press_flag == 0:
+                                                        if player.check_pos(x0, y0):
+                                                            # 根據棋子顏色判斷是否為我方下棋
+                                                            if (server.dropChess(x0, y0, player.get_color())):
+                                                                print(
+                                                                    'Drop chess in [%d, %d]' % (x0, y0))
+                                                            else:
+                                                                msg_flag = 1
+                                                                delay = 50
+                                                                print(
+                                                                    'Cannot drop chess')
+                                                        press_flag = 1
+
+                                            # msg
+                                            if msg_flag == 1 and delay > 0:
+                                                player.message('turnError')
+                                                delay -= 1
+                                            # Restart 按鈕
+                                            elif 700 <= x <= 800 and 200 <= y <= 250:
+                                                if player.get_isHost() and clicked and press_flag1 == 0:
+                                                    if server.game_reset():
+                                                        server.game_end(False)
+                                                        server.putColorBack(
+                                                            player.get_color())
+                                                        color = server.get_color()
+                                                        player.set_color(color)
+                                                        print('Restart')
+                                                    press_flag1 = 1
+                                            if player.get_isHost() == False:
+                                                server.putColorBack(
+                                                    player.get_color())
+                                                color = server.get_color()
+                                            if color:
+                                                player.set_color(color)
+                                            pygame.display.update()
                                 flag = ""
                                 index = 0
                 elif 50 <= x <= 450 and 350 <= y <= 450:  # 離開遊戲
