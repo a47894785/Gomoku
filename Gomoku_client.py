@@ -23,6 +23,8 @@ color = []
 clicked = False
 press_flag = 0
 press_flag1 = 0
+msg_flag = 0  # 0(normal) 1(turnError) 2()
+delay = 50
 # 棋子位置
 chess_pos = []
 # 建立pygame視窗
@@ -54,6 +56,10 @@ class Player():
         self.port = port
         self.color = []  # 棋子顏色
         self.is_host = False  # 是否為房主
+        self.msg = "normal"
+
+    def set_msg(self, str):
+        self.msg = str
 
     def posInfo(self, x, y):
         for i in range(20, 600, 40):
@@ -134,32 +140,18 @@ class Player():
     def message(self, situation):
         font = pygame.font.SysFont("", 35)
         if situation == 'turnError':
-            turnErr = font.render('Not Your Turn!', True, black)
-        win.blit(turnErr, (670, 60))
+            turnErr = font.render('Cannot drop chess!', True, [255, 0, 0])
+        win.blit(turnErr, (625, 60))
 
 
 def main():
-    global chess_pos, clicked, press_flag, color, press_flag1
+    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag
     if (len(sys.argv) < 3):
         print('Usage: python Gomoku_client.py ServerIP name')
         exit(1)
     server = xmlrpc.client.ServerProxy(
         'http://' + sys.argv[1] + ':' + str(PORT))
     run = False
-    # color = server.get_color()  # 從伺服器取得棋子顏色
-    # is_host = server.is_host(sys.argv[2])  # 伺服器回傳是否為房主
-    # if is_host:
-    #     print('You are the room host')
-    # 伺服器回傳False表示已滿兩人
-    # if color == False:
-    #     print('Room is full')
-    #     exit(1)
-    # print(color)
-    # 印出黑色或白色方
-    # if color == white:
-    #     print('You are white side')
-    # else:
-    #     print('You are black side')
     pygame.init()
     # 建立物件
     player = Player('abcd', sys.argv[2], '127.0.0.1', 8888)
@@ -479,11 +471,16 @@ def main():
                                                             print(
                                                                 'Drop chess in [%d, %d]' % (x0, y0))
                                                         else:
-                                                            player.message(
-                                                                'turnError')
+                                                            msg_flag = 1
+                                                            delay = 50
                                                             print(
-                                                                'Not your turn')
+                                                                'Cannot drop chess')
                                                     press_flag = 1
+
+                                        # msg
+                                        if msg_flag == 1 and delay > 0:
+                                            player.message('turnError')
+                                            delay -= 1
                                         # Restart 按鈕
                                         elif 700 <= x <= 800 and 200 <= y <= 250:
                                             if player.get_isHost() and clicked and press_flag1 == 0:

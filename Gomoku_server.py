@@ -23,6 +23,7 @@ class Gomoku:
         self.lock = threading.Lock()
         self.chess_pos = []
         self.color = [white, black]  # 預設list含有white,black
+        self.start = False
         self.host = ''
         self.have_host = False
         self.end = False
@@ -135,16 +136,19 @@ class Gomoku:
 
     # 根據player的顏色落棋
     def dropChess(self, x0, y0, color):
-        if len(self.chess_pos) % 2 == 0 and color == black:
-            self.lock.acquire()
-            self.chess_pos.append([[x0, y0], black])
-            self.lock.release()
-            return True
-        elif len(self.chess_pos) % 2 == 1 and color == white:
-            self.lock.acquire()
-            self.chess_pos.append([[x0, y0], white])
-            self.lock.release()
-            return True
+        if self.player == 2:
+            if len(self.chess_pos) % 2 == 0 and color == black:
+                self.lock.acquire()
+                self.chess_pos.append([[x0, y0], black])
+                self.lock.release()
+                return True
+            elif len(self.chess_pos) % 2 == 1 and color == white:
+                self.lock.acquire()
+                self.chess_pos.append([[x0, y0], white])
+                self.lock.release()
+                return True
+            else:
+                return False
         else:
             return False
 
