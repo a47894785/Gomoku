@@ -46,18 +46,19 @@ class Gomoku:
         return player
 
     def set_player(self, cmd):
-        if self.player < 2:
-            if cmd == True:
+        if cmd == True:
+            if self.player == 2:
+                return False
+            else:
                 self.lock.acquire()
                 self.player += 1
                 self.lock.release()
-            elif cmd == False:
-                self.lock.acquire()
-                self.player -= 1
-                self.lock.release()
+                return True
+        elif cmd == False:
+            self.lock.acquire()
+            self.player -= 1
+            self.lock.release()
             return True
-        elif self.player == 2:
-            return False
 
     def set_host_false(self):
         self.lock.acquire()
