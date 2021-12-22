@@ -23,7 +23,6 @@ class Gomoku:
         self.lock = threading.Lock()
         self.chess_pos = []
         self.color = [white, black]  # 預設list含有white,black
-        self.start = False
         self.host = ''
         self.have_host = False
         self.end = False
@@ -276,20 +275,38 @@ class Gomoku:
         return True
 
     def add_new_user(self, dict):
-        if(dict["username"] == "") | (dict["password"] == ""):
-            return False
-        ARR1.append(dict)
-        with open(FILE1, 'w') as wfp1:
-            json.dump(ARR1, wfp1)
-        print(ARR1)
-        return True
+        if(dict["username"] == ""):
+            return "nameisempty"
+        elif (dict["password"] == ""):
+            return "passisempty"
+        flag = True
+        for i in range(len(ARR1)):
+            if dict["username"] == (ARR1[i]['username']):
+                flag = False
+                return "nameisrepeat"
+        if(flag):
+            ARR1.append(dict)
+            self.lock.acquire()
+            with open(FILE1, 'w') as wfp1:
+                json.dump(ARR1, wfp1)
+            self.lock.release()
+            print(ARR1)
+            return "ok"
 
     def identify_user(self, dict):
         flag = False
         for i in range(len(ARR1)):
             if dict["username"] == (ARR1[i]['username']):
                 if dict["password"] == ARR1[i]["password"]:
-                    return "ok"
+                    if ARR1[i]["login"] == "N":
+                        ARR1[i]["login"] = "Y"
+                        self.lock.acquire()
+                        with open(FILE1, 'w') as wfp1:
+                            json.dump(ARR1, wfp1)
+                        self.lock.release()
+                        return "ok"
+                    else:
+                        return "login"
                 else:
                     return "pass"
                 flag = True

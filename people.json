@@ -1,1 +1,1 @@
-[{"password": "1234", "username": "test1"}, {"password": "1234", "username": "test1"}, {"password": "1234", "username": "test2"}]
+[{"login": "N", "password": "1111", "username": "AAAA"}, {"login": "N", "password": "2222", "username": "BBBB"}, {"login": "N", "password": "3333", "username": "CCCC"}, {"login": "Y", "password": "1234", "username": "test1"}, {"login": "Y", "password": "1234", "username": "test2"}, {"login": "N", "password": "1234", "username": "test3"}]
