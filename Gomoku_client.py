@@ -399,12 +399,39 @@ def main():
                                         win_start.fill(win_color)
                                         pygame.display.update()
                                         while(run_room):
+                                            temp_lsit = server.get_some_information()
+                                            #get_some_information()與server抓資料 裡面是好幾個list EX: [ [],[] ....]，而裡面好幾個list裡的資料 都是 第0個為房間人數 第1個為hostname 第2個為房間編號
+                                            x_y_room = []
+                                            #x_y_room 用來儲存 畫房間 每個房間的 編號 y_上界線 y_下界線 人數
+                                            global rect_room,rect_y,text_y
+                                            rect_y = int(50)
+                                            text_y = rect_y + 15
                                             pygame.draw.rect(win_start, button_on, rect_create_room)
                                             font = pygame.font.SysFont("", 55)
                                             text1 = font.render(text_create_room[0], True, black)
                                             text2 = font.render(text_create_room[1], True, black)
                                             win_start.blit(text1, (725, 530))
                                             win_start.blit(text2, (735, 565))
+                                            pygame.display.update()
+                                            for i in range(len(temp_lsit)):
+                                                if temp_lsit[i][0] != 0:
+                                                    rect_room = pygame.Rect(50,rect_y,500,50)
+                                                    pygame.draw.rect(win_start, button_on, rect_room)
+                                                    text3 = font.render(temp_lsit[i][1], True, black)
+                                                    win_start.blit(text3, (60, text_y))
+                                                    temp_string = str(temp_lsit[i][0]) + "/2"
+                                                    text4 = font.render(temp_string, True, black)
+                                                    win_start.blit(text4, (420, text_y))
+                                                    #以上是畫房間的 有點覽的打
+                                                    temp_x_y_room = []
+                                                    temp_x_y_room.append(temp_lsit[i][2])
+                                                    temp_x_y_room.append(rect_y)
+                                                    temp_x_y_room.append((rect_y+50))
+                                                    temp_x_y_room.append(temp_lsit[i][0])
+                                                    x_y_room.append(temp_x_y_room)
+                                                    #以上是 存入房間的 ID y上就現與 下界線 人數
+                                                    rect_y = rect_y + 50 + 50
+                                                    text_y = rect_y + 15
                                             pygame.display.update()
                                             for event in pygame.event.get():
                                                 if event.type == QUIT:
@@ -418,15 +445,23 @@ def main():
                                                 if clicked and press_flag == 0:
                                                     if 690 <= x <= 890 and 520 <= y <= 599:
                                                         temp_result = server.add_new_room()
+                                                        room_id = len(temp_lsit)
                                                         run = True
+                                                    elif 50 <= x <= 550:
+                                                        for i in range(len(x_y_room)):
+                                                            if x_y_room[i][1] <= y <= x_y_room[i][2]:
+                                                                if x_y_room[i][3] != 2:
+                                                                    run = True
+                                                                    room_id = x_y_room[i][0]
+                                                                else: 
+                                                                    print('---Room is full---')#只在cmd呈現應該要在遊戲畫面呈現
+                                                                break
                                                     press_flag = 1
-                                                    temp_result = server.get_color_list(room_id)
-                                                    print(temp_result)
                                                     if run == True:
                                                         num = server.set_player(True,room_id)
-                                                    if not num:
-                                                        print('Room is full')
-                                                    else:
+                                                    # if not num:
+                                                    #     print('Room is full')
+                                                    # else:
                                                         color = server.get_color(room_id)
                                                         player.set_color(color)
                                                         while run:

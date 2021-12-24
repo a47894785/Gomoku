@@ -38,6 +38,16 @@ class Gomoku:
         self.reset = []
         self.winSide = []
         self.player = []
+    def get_some_information(self):
+        list  = []
+        for i in range(len(self.player)):
+            templist = []
+            templist.append(self.player[i])
+            templist.append(self.host[i])
+            templist.append(int(i))
+            list.append(templist)
+        return list
+    
     def add_new_room(self):
         self.chess_pos.append([])
         self.color.append([white, black])
