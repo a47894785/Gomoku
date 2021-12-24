@@ -21,130 +21,149 @@ class ThreadXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 class Gomoku:
     def __init__(self):
         self.lock = threading.Lock()
-        self.chess_pos = []
-        self.color = [white, black]  # 預設list含有white,black
-        self.host = ''
-        self.have_host = False
-        self.end = False
-        self.reset = False
-        self.winSide = -1
-        self.player = 0
+        # self.chess_pos = []
+        # self.color = [white, black]  # 預設list含有white,black
+        # self.host = ''
+        # self.have_host = False
+        # self.end = False
+        # self.reset = False
+        # self.winSide = -1
+        # self.player = 0
 
-    def chess_reset(self):
+        self.chess_pos = []
+        self.color = []  # 預設list含有white,black
+        self.host = []
+        self.have_host = []
+        self.end = []
+        self.reset = []
+        self.winSide = []
+        self.player = []
+    def add_new_room(self):
+        self.chess_pos.append([])
+        self.color.append([white, black])
+        self.host.append("")
+        self.have_host.append(False)
+        self.end.append(False)
+        self.reset.append(False)
+        self.winSide.append(int(-1))
+        self.player.append(int(0))
+        return True
+
+    def chess_reset(self,id):
         self.lock.acquire()
-        self.chess_pos.clear()
+        self.chess_pos[id].clear()
         self.lock.release()
         return True
 
-    def get_color_list(self):
-        list = self.color
+    def get_color_list(self,id):
+        list = self.color[id]
         return list
 
-    def get_player(self):
-        player = self.player
+    def get_player(self,id):
+        player = self.player[id]
         return player
 
-    def set_player(self, cmd):
+    def set_player(self,cmd,id):
         if cmd == True:
-            if self.player == 2:
+            if self.player[id] == 2:
                 return False
             else:
                 self.lock.acquire()
-                self.player += 1
+                self.player[id] += 1
                 self.lock.release()
                 return True
         elif cmd == False:
             self.lock.acquire()
-            self.player -= 1
+            self.player[id] -= 1
             self.lock.release()
             return True
 
-    def set_host_false(self):
+    def set_host_false(self,id):
         self.lock.acquire()
-        self.have_host = False
-        self.host = ""
+        self.have_host[id] = False
+        self.host[id] = ""
         self.lock.release()
         return True
 
-    def putColorBack(self, color):
+    def putColorBack(self, color,id):
         self.lock.acquire()
-        self.color.append(color)
+        self.color[id].append(color)
         self.lock.release()
         return True
 
-    def get_reset(self):
-        reset = self.reset
+    def get_reset(self,id):
+        reset = self.reset[id]
         return reset
 
-    def set_reset(self, flag):
-        self.reset = flag
+    def set_reset(self, flag,id):
+        self.reset[id] = flag
 
-    def get_end(self):
-        end = self.end
+    def get_end(self,id):
+        end = self.end[id]
         return end
 
     # 回傳棋局是否結束
-    def is_end(self):
-        end = self.end
+    def is_end(self,id):
+        end = self.end[id]
         return end
     # 回傳勝利方 init = -1, black = 0, white = 1
 
-    def get_winSide(self):
-        winside = self.winSide
+    def get_winSide(self,id):
+        winside = self.winSide[id]
         return winside
     # 設定棋局是否結束
 
-    def game_end(self, value):
+    def game_end(self, value,id):
         self.lock.acquire()
         if value == True:
-            self.end = True
+            self.end[id] = True
         else:
-            self.end = False
+            self.end[id] = False
         self.lock.release()
         return True
     # 給予房主的權限
 
-    def is_host(self, name):
-        if self.have_host == False:  # 尚未有房主，指定房主(第一個連到Server者)
+    def is_host(self, name,id):
+        if self.have_host[id] == False:  # 尚未有房主，指定房主(第一個連到Server者)
             self.lock.acquire()
-            self.host = name
-            self.have_host = True
+            self.host[id] = name
+            self.have_host[id] = True
             self.lock.release()
             return True
-        elif self.host == name:
+        elif self.host[id] == name:
             return True
         else:  # 已經有房主回傳False
             return False
     # 隨機分配棋子顏色
 
-    def get_color(self):
-        if len(self.color) == 2:  # 尚未分配任何一個棋子
+    def get_color(self,id):
+        if len(self.color[id]) == 2:  # 尚未分配任何一個棋子
             randnum = random.randint(0, 1)
-            tmp = self.color[randnum]
+            tmp = self.color[id][randnum]
             self.lock.acquire()
-            self.color.remove(tmp)  # 從list移除該顏色
+            self.color[id].remove(tmp)  # 從list移除該顏色
             self.lock.release()
             return tmp
-        elif len(self.color) == 1:  # 已分配一個顏色
-            tmp = self.color[0]
+        elif len(self.color[id]) == 1:  # 已分配一個顏色
+            tmp = self.color[id][0]
             self.lock.acquire()
-            self.color.remove(tmp)  # 從list移除該顏色，之後color list為空
+            self.color[id].remove(tmp)  # 從list移除該顏色，之後color list為空
             self.lock.release()
             return tmp
         else:  # 沒有顏色可以分配(color list為空)
             return False
 
     # 根據player的顏色落棋
-    def dropChess(self, x0, y0, color):
-        if self.player == 2:
-            if len(self.chess_pos) % 2 == 0 and color == black:
+    def dropChess(self, x0, y0, color,id):
+        if self.player[id] == 2:
+            if len(self.chess_pos[id]) % 2 == 0 and color == black:
                 self.lock.acquire()
-                self.chess_pos.append([[x0, y0], black])
+                self.chess_pos[id].append([[x0, y0], black])
                 self.lock.release()
                 return True
-            elif len(self.chess_pos) % 2 == 1 and color == white:
+            elif len(self.chess_pos[id]) % 2 == 1 and color == white:
                 self.lock.acquire()
-                self.chess_pos.append([[x0, y0], white])
+                self.chess_pos[id].append([[x0, y0], white])
                 self.lock.release()
                 return True
             else:
@@ -153,14 +172,14 @@ class Gomoku:
             return False
 
     # 回傳當前各棋子位置
-    def get_chess_pos(self):
-        pos = self.chess_pos
+    def get_chess_pos(self,id):
+        pos = self.chess_pos[id]
         return pos
 
     # 判斷勝負
-    def check_win(self):
+    def check_win(self,id):
         map = np.zeros([15, 15], dtype=int)
-        for val in self.chess_pos:
+        for val in self.chess_pos[id]:
             x = int((val[0][0]-20)/40)
             y = int((val[0][1]-20)/40)
             if val[1] == white:
@@ -182,12 +201,12 @@ class Gomoku:
                     pos2 = []
                 if len(pos1) >= 5:  # 五子連心
                     self.lock.acquire()
-                    self.winSide = 0
+                    self.winSide[id] = 0
                     self.lock.release()
                     return [1, pos1]
                 if len(pos2) >= 5:
                     self.lock.acquire()
-                    self.winSide = 1
+                    self.winSide[id] = 1
                     self.lock.release()
                     return [2, pos2]
 
@@ -205,12 +224,12 @@ class Gomoku:
                     pos2 = []
                 if len(pos1) >= 5:
                     self.lock.acquire()
-                    self.winSide = 0
+                    self.winSide[id] = 0
                     self.lock.release()
                     return [1, pos1]
                 if len(pos2) >= 5:
                     self.lock.acquire()
-                    self.winSide = 1
+                    self.winSide[id] = 1
                     self.lock.release()
                     return [2, pos2]
         for i in range(15):
@@ -230,12 +249,12 @@ class Gomoku:
                         pos2 = []
                     if len(pos1) >= 5:
                         self.lock.acquire()
-                        self.winSide = 0
+                        self.winSide[id] = 0
                         self.lock.release()
                         return [1, pos1]
                     if len(pos2) >= 5:
                         self.lock.acquire()
-                        self.winSide = 1
+                        self.winSide[id] = 1
                         self.lock.release()
                         return [2, pos2]
         for i in range(15):
@@ -255,22 +274,22 @@ class Gomoku:
                         pos2 = []
                     if len(pos1) >= 5:
                         self.lock.acquire()
-                        self.winSide = 0
+                        self.winSide[id] = 0
                         self.lock.release()
                         return [1, pos1]
                     if len(pos2) >= 5:
                         self.lock.acquire()
-                        self.winSide = 1
+                        self.winSide[id] = 1
                         self.lock.release()
                         return [2, pos2]
         return [0, []]
     # 重新開始棋局，清空chess_pos並將winSide設回初始值
 
-    def game_reset(self):
+    def game_reset(self,id):
         self.lock.acquire()
-        self.chess_pos.clear()
-        self.winSide = -1
-        self.reset = True
+        self.chess_pos[id].clear()
+        self.winSide[id] = -1
+        self.reset[id] = True
         self.lock.release()
         return True
 

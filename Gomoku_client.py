@@ -45,12 +45,15 @@ rect_submit_log_or_new = pygame.Rect(550, 450, 200, 100)
 rect_erase = pygame.Rect(100, 200, 700, 99)
 rect_enter = pygame.Rect(400, 275, 100, 50)
 text_create = ["Create Username:", "Create Password:"]  # 帳號 以及 密碼
+rect_create_room = pygame.Rect(690, 520, 200, 79)
 text_log = ["Input Username:", "Input Password:"]
 text_start = ["New User", "Log In", "Exit Game"]
 text_warning = ""
 text_username = ""  # 存入帳號
 text_password = ""  # 存入密碼
 text_exit_log_or_new = ["exit", "submit"]
+text_create_room = ["create","room"]
+room_id = int(0)
 new_dict = {}
 
 
@@ -116,6 +119,7 @@ class Player():
         # 顯示文字
         font = pygame.font.SysFont("", 35)
         text1 = font.render('Restart', True, black)
+        text2 = ""
         if self.color == black:
             text2 = font.render('BLACK', True, black)
         elif self.color == white:
@@ -189,17 +193,18 @@ class Player():
 
 
 def main():
-    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag
+    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag,room_id
     if (len(sys.argv) < 3):
         print('Usage: python Gomoku_client.py ServerIP name')
         exit(1)
     server = xmlrpc.client.ServerProxy(
         'http://' + sys.argv[1] + ':' + str(PORT))
     run = False
+    room_id = int(sys.argv[2])
     pygame.init()
     # 建立物件
     player = Player('abcd', sys.argv[2], '127.0.0.1', 8888)
-    print('server color list: ' + str(server.get_color_list()))
+    #print('server color list: ' + str(server.get_color_list(room_id)))
     # num = server.set_player(True)
     # if not num:
     #     print('Room is full.')
@@ -208,6 +213,7 @@ def main():
     # player.set_color(color)
     run_system = True
     run_write = False
+    run_room = False
     run_identify = False
     run_room = False
     global win_start, win_room
@@ -242,21 +248,15 @@ def main():
                     pygame.display.update()
                     run_write = True
                     while run_write:
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_input_username)
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_input_password)
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_exit_log_or_new)
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_submit_log_or_new)
+                        pygame.draw.rect(win_start, button_on,rect_input_username)
+                        pygame.draw.rect(win_start, button_on,rect_input_password)
+                        pygame.draw.rect(win_start, button_on,rect_exit_log_or_new)
+                        pygame.draw.rect(win_start, button_on,rect_submit_log_or_new)
                         font = pygame.font.SysFont("", 75)
                         text1 = font.render(text_create[0], True, black)
                         text2 = font.render(text_create[1], True, black)
-                        text3 = font.render(
-                            text_exit_log_or_new[0], True, black)
-                        text4 = font.render(
-                            text_exit_log_or_new[1], True, black)
+                        text3 = font.render(text_exit_log_or_new[0], True, black)
+                        text4 = font.render(text_exit_log_or_new[1], True, black)
                         win_start.blit(text1, (55, 125))
                         win_start.blit(text2, (55, 325))
                         win_start.blit(text3, (150, 475))
@@ -312,15 +312,13 @@ def main():
                                     if index == 0:  # index = 0(表示username)
                                         # 去判定新增的name不能大於9個(為啥是9個，我也不知道)
                                         if (len(text_username) >= 10):
-                                            player.warming_text(
-                                                "usernameislong")
+                                            player.warming_text("usernameislong")
                                         else:
                                             text_create[index] += event.unicode
                                             text_username += event.unicode
                                     elif index == 1:  # index = 1(表示password)
                                         if (len(text_password) >= 10):
-                                            player.warming_text(
-                                                "passwordislong")
+                                            player.warming_text("passwordislong")
                                         else:
                                             text_create[index] += '*'
                                             text_password += event.unicode
@@ -330,21 +328,15 @@ def main():
                     run_identify = True
                     index = 0
                     while run_identify:
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_input_username)
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_input_password)
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_exit_log_or_new)
-                        pygame.draw.rect(win_start, button_on,
-                                         rect_submit_log_or_new)
+                        pygame.draw.rect(win_start, button_on,rect_input_username)
+                        pygame.draw.rect(win_start, button_on,rect_input_password)
+                        pygame.draw.rect(win_start, button_on,rect_exit_log_or_new)
+                        pygame.draw.rect(win_start, button_on,rect_submit_log_or_new)
                         font = pygame.font.SysFont("", 75)
                         text1 = font.render(text_log[0], True, black)
                         text2 = font.render(text_log[1], True, black)
-                        text3 = font.render(
-                            text_exit_log_or_new[0], True, black)
-                        text4 = font.render(
-                            text_exit_log_or_new[1], True, black)
+                        text3 = font.render(text_exit_log_or_new[0], True, black)
+                        text4 = font.render(text_exit_log_or_new[1], True, black)
                         win_start.blit(text1, (55, 125))
                         win_start.blit(text2, (55, 325))
                         win_start.blit(text3, (150, 475))
@@ -401,104 +393,118 @@ def main():
                                     elif flag == "ok":  # 若是ok則進入遊戲了~~
                                         index = 0
                                         run_identify = False
-                                        print(new_dict)
-                                        run = True
-                                        num = server.set_player(True)
-                                        if not num:
-                                            print('Room is full')
-                                        else:
-                                            color = server.get_color()
-                                            player.set_color(color)
-                                            while run:
-                                                for event in pygame.event.get():
-                                                    if event.type == QUIT:
-                                                        quit = server.putColorBack(
-                                                            player.get_color())
-                                                        print(
-                                                            'Put ' + str(player.get_color()) + ' back.')
-                                                        print(quit)
-                                                        if player.get_isHost():
-                                                            server.set_host_false()
-                                                            player.set_host(
-                                                                False)
-                                                        print(
-                                                            "---------> player : %d" % (server.get_player()))
-                                                        server.set_player(
-                                                            False)
-                                                        chessReset = server.chess_reset()
-                                                        sys.exit()
-                                                    elif event.type == MOUSEBUTTONDOWN:
-                                                        clicked = True
-                                                    elif event.type == MOUSEBUTTONUP:
-                                                        clicked = False
-                                                        press_flag = 0  # 棋盤上
-                                                        press_flag1 = 0  # Restart
-                                                is_host = server.is_host(
-                                                    sys.argv[2])
-                                                player.set_host(is_host)
-                                                player.drawChessBoard()  # 繪製棋盤
-                                                chess_pos = server.get_chess_pos()  # 取得棋子位置
-                                                player.drawChess()  # 繪製棋子
-                                                result = server.check_win()  # 判斷勝負
-                                                winSide = server.get_winSide()  # 取得勝利方 init = -1, black = 0, white = 1
-                                                # 若有一方勝利且棋局尚未結束，先將棋局結束後印出勝利方
-                                                if winSide != -1 and not server.is_end():
-                                                    if winSide == 0:
-                                                        print('Black Win')
-                                                    else:
-                                                        print('White Win')
-                                                    if is_host:  # 若是房主則向伺服器請求將棋局結束
-                                                        server.game_end(True)
-                                                if winSide != -1:
-                                                    player.printWin(winSide)
-                                                # 取得滑鼠座標
+                                        #run = True
+                                        run_room = True
+                                        num = False 
+                                        win_start.fill(win_color)
+                                        pygame.display.update()
+                                        while(run_room):
+                                            pygame.draw.rect(win_start, button_on, rect_create_room)
+                                            font = pygame.font.SysFont("", 55)
+                                            text1 = font.render(text_create_room[0], True, black)
+                                            text2 = font.render(text_create_room[1], True, black)
+                                            win_start.blit(text1, (725, 530))
+                                            win_start.blit(text2, (735, 565))
+                                            pygame.display.update()
+                                            for event in pygame.event.get():
+                                                if event.type == QUIT:
+                                                    sys.exit()
+                                                elif event.type == MOUSEBUTTONDOWN:
+                                                    clicked = True
+                                                elif event.type == MOUSEBUTTONUP:
+                                                    clicked = False
+                                                    press_flag = 0
                                                 x, y = pygame.mouse.get_pos()
-                                                if x <= 600:  # 在棋盤範圍內
-                                                    x0, y0 = player.posInfo(
-                                                        x, y)
-                                                    if player.check_pos(x0, y0):
-                                                        pygame.draw.rect(win, [255, 0, 0], [
-                                                            x0 - 20, y0 - 20, 40, 40], 2, 1)
-
-                                                chess_pos = server.get_chess_pos()  # 取得棋子位置
-                                                if x <= 600:  # 在棋盤範圍內
-                                                    if not server.is_end():
-                                                        if clicked and press_flag == 0:
-                                                            if player.check_pos(x0, y0):
-                                                                # 根據棋子顏色判斷是否為我方下棋
-                                                                if (server.dropChess(x0, y0, player.get_color())):
-                                                                    print(
-                                                                        'Drop chess in [%d, %d]' % (x0, y0))
+                                                if clicked and press_flag == 0:
+                                                    if 690 <= x <= 890 and 520 <= y <= 599:
+                                                        temp_result = server.add_new_room()
+                                                        run = True
+                                                    press_flag = 1
+                                                    temp_result = server.get_color_list(room_id)
+                                                    print(temp_result)
+                                                    if run == True:
+                                                        num = server.set_player(True,room_id)
+                                                    if not num:
+                                                        print('Room is full')
+                                                    else:
+                                                        color = server.get_color(room_id)
+                                                        player.set_color(color)
+                                                        while run:
+                                                            for event in pygame.event.get():
+                                                                if event.type == QUIT:
+                                                                    quit = server.putColorBack(player.get_color(),room_id)
+                                                                    print('Put ' + str(player.get_color()) + ' back.')
+                                                                    print(quit)
+                                                                    if player.get_isHost():
+                                                                        server.set_host_false(room_id)
+                                                                        player.set_host(False)
+                                                                    print("---------> player : %d" % (server.get_player(room_id)))
+                                                                    server.set_player(False,room_id)
+                                                                    chessReset = server.chess_reset(room_id)
+                                                                    sys.exit()
+                                                                elif event.type == MOUSEBUTTONDOWN:
+                                                                    clicked = True
+                                                                elif event.type == MOUSEBUTTONUP:
+                                                                    clicked = False
+                                                                    press_flag = 0  # 棋盤上
+                                                                    press_flag1 = 0  # Restart
+                                                            is_host = server.is_host(new_dict["username"],room_id)
+                                                            player.set_host(is_host)
+                                                            player.drawChessBoard()  # 繪製棋盤
+                                                            chess_pos = server.get_chess_pos(room_id)  # 取得棋子位置
+                                                            player.drawChess()  # 繪製棋子
+                                                            result = server.check_win(room_id)  # 判斷勝負
+                                                            winSide = server.get_winSide(room_id)  # 取得勝利方 init = -1, black = 0, white = 1
+                                                            # 若有一方勝利且棋局尚未結束，先將棋局結束後印出勝利方
+                                                            if winSide != -1 and not server.is_end(room_id):
+                                                                if winSide == 0:
+                                                                    print('Black Win')
                                                                 else:
-                                                                    msg_flag = 1
-                                                                    delay = 50
-                                                                    print(
-                                                                        'Cannot drop chess!')
-                                                            press_flag = 1
-                                                # msg
-                                                if msg_flag == 1 and delay > 0:
-                                                    player.message('turnError')
-                                                    delay -= 1
-                                                # Restart 按鈕
-                                                elif 700 <= x <= 800 and 200 <= y <= 250:
-                                                    if player.get_isHost() and clicked and press_flag1 == 0:
-                                                        if server.game_reset():
-                                                            server.game_end(
-                                                                False)
-                                                            server.putColorBack(
-                                                                player.get_color())
-                                                            color = server.get_color()
-                                                            player.set_color(
-                                                                color)
-                                                            print('Restart')
-                                                        press_flag1 = 1
-                                                if player.get_isHost() == False:
-                                                    server.putColorBack(
-                                                        player.get_color())
-                                                    color = server.get_color()
-                                                if color:
-                                                    player.set_color(color)
-                                                pygame.display.update()
+                                                                    print('White Win')
+                                                                if is_host:  # 若是房主則向伺服器請求將棋局結束
+                                                                    server.game_end(True,room_id)
+                                                            if winSide != -1:
+                                                                player.printWin(winSide)
+                                                            # 取得滑鼠座標
+                                                            x, y = pygame.mouse.get_pos()
+                                                            if x <= 600:  # 在棋盤範圍內
+                                                                x0, y0 = player.posInfo(x, y)
+                                                                if player.check_pos(x0, y0):
+                                                                    pygame.draw.rect(win, [255, 0, 0], [x0 - 20, y0 - 20, 40, 40], 2, 1)
+
+                                                            chess_pos = server.get_chess_pos(room_id)  # 取得棋子位置
+                                                            if x <= 600:  # 在棋盤範圍內
+                                                                if not server.is_end(room_id):
+                                                                    if clicked and press_flag == 0:
+                                                                        if player.check_pos(x0, y0):
+                                                                            # 根據棋子顏色判斷是否為我方下棋
+                                                                            if (server.dropChess(x0, y0, player.get_color(),room_id)):
+                                                                                print('Drop chess in [%d, %d]' % (x0, y0))
+                                                                            else:
+                                                                                msg_flag = 1
+                                                                                delay = 50
+                                                                                print('Cannot drop chess!')
+                                                                        press_flag = 1
+                                                            # msg
+                                                            if msg_flag == 1 and delay > 0:
+                                                                player.message('turnError')
+                                                                delay -= 1
+                                                            # Restart 按鈕
+                                                            elif 700 <= x <= 800 and 200 <= y <= 250:
+                                                                if player.get_isHost() and clicked and press_flag1 == 0:
+                                                                    if server.game_reset(room_id):
+                                                                        server.game_end(False,room_id)
+                                                                        server.putColorBack(player.get_color(),room_id)
+                                                                        color = server.get_color(room_id)
+                                                                        player.set_color(color)
+                                                                        print('Restart')
+                                                                    press_flag1 = 1
+                                                            if player.get_isHost() == False:
+                                                                server.putColorBack(player.get_color(),room_id)
+                                                                color = server.get_color(room_id)
+                                                            if color:
+                                                                player.set_color(color)
+                                                            pygame.display.update()
                                     flag = ""
                                     index = 0
                                 press_flag = 1
@@ -513,7 +519,6 @@ def main():
                                     elif index == 1:
                                         text_password = text_password[:-1]
                                 else:
-                                    print(index)
                                     if index == 0:
                                         if (len(text_username) >= 10):
                                             player.warming_text(
