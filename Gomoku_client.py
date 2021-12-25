@@ -477,6 +477,10 @@ def main():
                                                 for event in pygame.event.get():
                                                     if event.type == QUIT:
                                                         logOut = server.log_out(new_dict)
+                                                        text_log[0] = "Input Username:"
+                                                        text_log[1] = "Input Password:"
+                                                        text_username = ""
+                                                        text_password = ""
                                                         sys.exit()
                                                     elif event.type == MOUSEBUTTONDOWN:
                                                         clicked = True
@@ -535,8 +539,13 @@ def main():
                                                                         print("---------> player : %d" % (server.get_player(room_id)))
                                                                         server.set_player(False, room_id)
                                                                         chessReset = server.chess_reset(room_id)
+                                                                        # server.exit_room(room_id)
+                                                                        # server.roomChange(True)
                                                                         logOut = server.log_out(new_dict)
-                                                                        sys.exit()
+                                                                        win_start.fill(win_color)
+                                                                        pygame.display.update()
+                                                                        run = False
+                                                                        break
                                                                     elif event.type == MOUSEBUTTONDOWN:
                                                                         clicked = True
                                                                     elif event.type == MOUSEBUTTONUP:
@@ -544,6 +553,8 @@ def main():
                                                                         press_dropChess = 0  # 棋盤上
                                                                         press_flag1 = 0  # Restart
                                                                         press_flag2 = 0  # exit
+                                                                if run == False:
+                                                                    continue
                                                                 is_host = server.is_host(new_dict["username"], room_id)
                                                                 player.set_host(is_host)
                                                                 # print('roomHost ======> %s' % (temp_list[room_id][1]))
