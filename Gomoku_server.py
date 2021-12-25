@@ -38,8 +38,9 @@ class Gomoku:
         self.reset = []
         self.winSide = []
         self.player = []
+
     def get_some_information(self):
-        list  = []
+        list = []
         for i in range(len(self.player)):
             templist = []
             templist.append(self.player[i])
@@ -47,7 +48,7 @@ class Gomoku:
             templist.append(int(i))
             list.append(templist)
         return list
-    
+
     def add_new_room(self):
         self.chess_pos.append([])
         self.color.append([white, black])
@@ -59,21 +60,21 @@ class Gomoku:
         self.player.append(int(0))
         return True
 
-    def chess_reset(self,id):
+    def chess_reset(self, id):
         self.lock.acquire()
         self.chess_pos[id].clear()
         self.lock.release()
         return True
 
-    def get_color_list(self,id):
+    def get_color_list(self, id):
         list = self.color[id]
         return list
 
-    def get_player(self,id):
+    def get_player(self, id):
         player = self.player[id]
         return player
 
-    def set_player(self,cmd,id):
+    def set_player(self, cmd, id):
         if cmd == True:
             if self.player[id] == 2:
                 return False
@@ -88,42 +89,42 @@ class Gomoku:
             self.lock.release()
             return True
 
-    def set_host_false(self,id):
+    def set_host_false(self, id):
         self.lock.acquire()
         self.have_host[id] = False
         self.host[id] = ""
         self.lock.release()
         return True
 
-    def putColorBack(self, color,id):
+    def putColorBack(self, color, id):
         self.lock.acquire()
         self.color[id].append(color)
         self.lock.release()
         return True
 
-    def get_reset(self,id):
+    def get_reset(self, id):
         reset = self.reset[id]
         return reset
 
-    def set_reset(self, flag,id):
+    def set_reset(self, flag, id):
         self.reset[id] = flag
 
-    def get_end(self,id):
+    def get_end(self, id):
         end = self.end[id]
         return end
 
     # 回傳棋局是否結束
-    def is_end(self,id):
+    def is_end(self, id):
         end = self.end[id]
         return end
     # 回傳勝利方 init = -1, black = 0, white = 1
 
-    def get_winSide(self,id):
+    def get_winSide(self, id):
         winside = self.winSide[id]
         return winside
     # 設定棋局是否結束
 
-    def game_end(self, value,id):
+    def game_end(self, value, id):
         self.lock.acquire()
         if value == True:
             self.end[id] = True
@@ -133,7 +134,7 @@ class Gomoku:
         return True
     # 給予房主的權限
 
-    def is_host(self, name,id):
+    def is_host(self, name, id):
         if self.have_host[id] == False:  # 尚未有房主，指定房主(第一個連到Server者)
             self.lock.acquire()
             self.host[id] = name
@@ -146,7 +147,7 @@ class Gomoku:
             return False
     # 隨機分配棋子顏色
 
-    def get_color(self,id):
+    def get_color(self, id):
         if len(self.color[id]) == 2:  # 尚未分配任何一個棋子
             randnum = random.randint(0, 1)
             tmp = self.color[id][randnum]
@@ -164,7 +165,7 @@ class Gomoku:
             return False
 
     # 根據player的顏色落棋
-    def dropChess(self, x0, y0, color,id):
+    def dropChess(self, x0, y0, color, id):
         if self.player[id] == 2:
             if len(self.chess_pos[id]) % 2 == 0 and color == black:
                 self.lock.acquire()
@@ -182,12 +183,12 @@ class Gomoku:
             return False
 
     # 回傳當前各棋子位置
-    def get_chess_pos(self,id):
+    def get_chess_pos(self, id):
         pos = self.chess_pos[id]
         return pos
 
     # 判斷勝負
-    def check_win(self,id):
+    def check_win(self, id):
         map = np.zeros([15, 15], dtype=int)
         for val in self.chess_pos[id]:
             x = int((val[0][0]-20)/40)
@@ -295,7 +296,7 @@ class Gomoku:
         return [0, []]
     # 重新開始棋局，清空chess_pos並將winSide設回初始值
 
-    def game_reset(self,id):
+    def game_reset(self, id):
         self.lock.acquire()
         self.chess_pos[id].clear()
         self.winSide[id] = -1
@@ -342,6 +343,16 @@ class Gomoku:
                 break
         if flag == False:
             return "name"
+
+    def log_out(self, dict):
+        for i in range(len(ARR1)):
+            if dict["username"] == (ARR1[i]["username"]):
+                ARR1[i]['login'] = "N"
+                self.lock.acquire()
+                with open(FILE1, 'w') as wfp1:
+                    json.dump(ARR1, wfp1)
+                self.lock.release()
+                return "ok"
 
 
 def main():

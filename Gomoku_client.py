@@ -52,7 +52,7 @@ text_warning = ""
 text_username = ""  # 存入帳號
 text_password = ""  # 存入密碼
 text_exit_log_or_new = ["exit", "submit"]
-text_create_room = ["create","room"]
+text_create_room = ["create", "room"]
 room_id = int(0)
 new_dict = {}
 
@@ -157,15 +157,15 @@ class Player():
         global text_warning
         if string == 'nameisrepeat':  # flag為false表示新增失敗(可能某行 整個都是空白...)
             text_warning = ""
-            text_warning = text_warning + "new username is already have"
+            text_warning = text_warning + "Username is already exist"
             # 等待幾秒後，再把提醒字眼給覆蓋掉
         elif string == 'nameisempty':  # flag為false表示新增失敗(可能某行 整個都是空白...)
             text_warning = ""
-            text_warning = text_warning + "new username is empty"
+            text_warning = text_warning + "Username is empty"
             # 等待幾秒後，再把提醒字眼給覆蓋掉
         elif string == 'passisempty':  # flag為false表示新增失敗(可能某行 整個都是空白...)
             text_warning = ""
-            text_warning = text_warning + "new password is empty"
+            text_warning = text_warning + "Password is empty"
         elif string == 'usernameislong':
             text_warning = ""
             text_warning = text_warning + "Username is too long"
@@ -174,15 +174,15 @@ class Player():
             text_warning = text_warning + "Password is too long"
         elif string == 'notfindusername':
             text_warning = ""
-            text_warning = text_warning + "Didn't find this username"
+            text_warning = text_warning + "Username Input Error"
         elif string == 'passworderror':
             text_warning = ""
-            text_warning = text_warning + "Input password is error"
+            text_warning = text_warning + "Password input Error"
         elif string == 'loginalready':
             text_warning = ""
-            text_warning = text_warning + "This account has already login"
+            text_warning = text_warning + "Account is already login"
         font = pygame.font.SysFont("", 35)
-        text1 = font.render(text_warning, True, black)
+        text1 = font.render(text_warning, True, [255, 0, 0])
         win_start.blit(text1, (300, 250))
         pygame.display.update()
         # 上面就是顯示提醒的字眼
@@ -193,14 +193,13 @@ class Player():
 
 
 def main():
-    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag,room_id
-    if (len(sys.argv) < 3):
-        print('Usage: python Gomoku_client.py ServerIP name')
+    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag, room_id
+    if (len(sys.argv) < 2):
+        print('Usage: python Gomoku_client.py ServerIP')
         exit(1)
-    server = xmlrpc.client.ServerProxy(
-        'http://' + sys.argv[1] + ':' + str(PORT))
+    server = xmlrpc.client.ServerProxy('http://' + sys.argv[1] + ':' + str(PORT))
     run = False
-    room_id = int(sys.argv[2])
+    # room_id = int(sys.argv[2])
     pygame.init()
     # 建立物件
     player = Player('abcd', sys.argv[2], '127.0.0.1', 8888)
@@ -248,10 +247,10 @@ def main():
                     pygame.display.update()
                     run_write = True
                     while run_write:
-                        pygame.draw.rect(win_start, button_on,rect_input_username)
-                        pygame.draw.rect(win_start, button_on,rect_input_password)
-                        pygame.draw.rect(win_start, button_on,rect_exit_log_or_new)
-                        pygame.draw.rect(win_start, button_on,rect_submit_log_or_new)
+                        pygame.draw.rect(win_start, button_on, rect_input_username)
+                        pygame.draw.rect(win_start, button_on, rect_input_password)
+                        pygame.draw.rect(win_start, button_on, rect_exit_log_or_new)
+                        pygame.draw.rect(win_start, button_on, rect_submit_log_or_new)
                         font = pygame.font.SysFont("", 75)
                         text1 = font.render(text_create[0], True, black)
                         text2 = font.render(text_create[1], True, black)
@@ -328,10 +327,10 @@ def main():
                     run_identify = True
                     index = 0
                     while run_identify:
-                        pygame.draw.rect(win_start, button_on,rect_input_username)
-                        pygame.draw.rect(win_start, button_on,rect_input_password)
-                        pygame.draw.rect(win_start, button_on,rect_exit_log_or_new)
-                        pygame.draw.rect(win_start, button_on,rect_submit_log_or_new)
+                        pygame.draw.rect(win_start, button_on, rect_input_username)
+                        pygame.draw.rect(win_start, button_on, rect_input_password)
+                        pygame.draw.rect(win_start, button_on, rect_exit_log_or_new)
+                        pygame.draw.rect(win_start, button_on, rect_submit_log_or_new)
                         font = pygame.font.SysFont("", 75)
                         text1 = font.render(text_log[0], True, black)
                         text2 = font.render(text_log[1], True, black)
@@ -395,15 +394,19 @@ def main():
                                         run_identify = False
                                         #run = True
                                         run_room = True
-                                        num = False 
+                                        num = False
                                         win_start.fill(win_color)
                                         pygame.display.update()
+                                        room_flag = 0
                                         while(run_room):
                                             temp_lsit = server.get_some_information()
-                                            #get_some_information()與server抓資料 裡面是好幾個list EX: [ [],[] ....]，而裡面好幾個list裡的資料 都是 第0個為房間人數 第1個為hostname 第2個為房間編號
+                                            if room_flag == 0:
+                                                print(temp_lsit)
+                                                room_flag = 1
+                                            # get_some_information()與server抓資料 裡面是好幾個list EX: [ [],[] ....]，而裡面好幾個list裡的資料 都是 第0個為房間人數 第1個為hostname 第2個為房間編號
                                             x_y_room = []
-                                            #x_y_room 用來儲存 畫房間 每個房間的 編號 y_上界線 y_下界線 人數
-                                            global rect_room,rect_y,text_y
+                                            # x_y_room 用來儲存 畫房間 每個房間的 編號 y_上界線 y_下界線 人數
+                                            global rect_room, rect_y, text_y
                                             rect_y = int(50)
                                             text_y = rect_y + 15
                                             pygame.draw.rect(win_start, button_on, rect_create_room)
@@ -415,26 +418,27 @@ def main():
                                             pygame.display.update()
                                             for i in range(len(temp_lsit)):
                                                 if temp_lsit[i][0] != 0:
-                                                    rect_room = pygame.Rect(50,rect_y,500,50)
+                                                    rect_room = pygame.Rect(50, rect_y, 500, 50)
                                                     pygame.draw.rect(win_start, button_on, rect_room)
                                                     text3 = font.render(temp_lsit[i][1], True, black)
                                                     win_start.blit(text3, (60, text_y))
                                                     temp_string = str(temp_lsit[i][0]) + "/2"
                                                     text4 = font.render(temp_string, True, black)
                                                     win_start.blit(text4, (420, text_y))
-                                                    #以上是畫房間的 有點覽的打
+                                                    # 以上是畫房間的 有點覽的打
                                                     temp_x_y_room = []
                                                     temp_x_y_room.append(temp_lsit[i][2])
                                                     temp_x_y_room.append(rect_y)
                                                     temp_x_y_room.append((rect_y+50))
                                                     temp_x_y_room.append(temp_lsit[i][0])
                                                     x_y_room.append(temp_x_y_room)
-                                                    #以上是 存入房間的 ID y上就現與 下界線 人數
+                                                    # 以上是 存入房間的 ID y上就現與 下界線 人數
                                                     rect_y = rect_y + 50 + 50
                                                     text_y = rect_y + 15
                                             pygame.display.update()
                                             for event in pygame.event.get():
                                                 if event.type == QUIT:
+                                                    logOut = server.log_out(new_dict)
                                                     sys.exit()
                                                 elif event.type == MOUSEBUTTONDOWN:
                                                     clicked = True
@@ -453,12 +457,13 @@ def main():
                                                                 if x_y_room[i][3] != 2:
                                                                     run = True
                                                                     room_id = x_y_room[i][0]
-                                                                else: 
-                                                                    print('---Room is full---')#只在cmd呈現應該要在遊戲畫面呈現
+                                                                else:
+                                                                    # 只在cmd呈現應該要在遊戲畫面呈現
+                                                                    print('---Room is full---')
                                                                 break
                                                     press_flag = 1
                                                     if run == True:
-                                                        num = server.set_player(True,room_id)
+                                                        num = server.set_player(True, room_id)
                                                     # if not num:
                                                     #     print('Room is full')
                                                     # else:
@@ -467,15 +472,16 @@ def main():
                                                         while run:
                                                             for event in pygame.event.get():
                                                                 if event.type == QUIT:
-                                                                    quit = server.putColorBack(player.get_color(),room_id)
+                                                                    quit = server.putColorBack(player.get_color(), room_id)
                                                                     print('Put ' + str(player.get_color()) + ' back.')
                                                                     print(quit)
                                                                     if player.get_isHost():
                                                                         server.set_host_false(room_id)
                                                                         player.set_host(False)
                                                                     print("---------> player : %d" % (server.get_player(room_id)))
-                                                                    server.set_player(False,room_id)
+                                                                    server.set_player(False, room_id)
                                                                     chessReset = server.chess_reset(room_id)
+                                                                    logOut = server.log_out(new_dict)
                                                                     sys.exit()
                                                                 elif event.type == MOUSEBUTTONDOWN:
                                                                     clicked = True
@@ -483,13 +489,14 @@ def main():
                                                                     clicked = False
                                                                     press_flag = 0  # 棋盤上
                                                                     press_flag1 = 0  # Restart
-                                                            is_host = server.is_host(new_dict["username"],room_id)
+                                                            is_host = server.is_host(new_dict["username"], room_id)
                                                             player.set_host(is_host)
                                                             player.drawChessBoard()  # 繪製棋盤
                                                             chess_pos = server.get_chess_pos(room_id)  # 取得棋子位置
                                                             player.drawChess()  # 繪製棋子
                                                             result = server.check_win(room_id)  # 判斷勝負
-                                                            winSide = server.get_winSide(room_id)  # 取得勝利方 init = -1, black = 0, white = 1
+                                                            # 取得勝利方 init = -1, black = 0, white = 1
+                                                            winSide = server.get_winSide(room_id)
                                                             # 若有一方勝利且棋局尚未結束，先將棋局結束後印出勝利方
                                                             if winSide != -1 and not server.is_end(room_id):
                                                                 if winSide == 0:
@@ -497,7 +504,7 @@ def main():
                                                                 else:
                                                                     print('White Win')
                                                                 if is_host:  # 若是房主則向伺服器請求將棋局結束
-                                                                    server.game_end(True,room_id)
+                                                                    server.game_end(True, room_id)
                                                             if winSide != -1:
                                                                 player.printWin(winSide)
                                                             # 取得滑鼠座標
@@ -513,7 +520,7 @@ def main():
                                                                     if clicked and press_flag == 0:
                                                                         if player.check_pos(x0, y0):
                                                                             # 根據棋子顏色判斷是否為我方下棋
-                                                                            if (server.dropChess(x0, y0, player.get_color(),room_id)):
+                                                                            if (server.dropChess(x0, y0, player.get_color(), room_id)):
                                                                                 print('Drop chess in [%d, %d]' % (x0, y0))
                                                                             else:
                                                                                 msg_flag = 1
@@ -528,17 +535,21 @@ def main():
                                                             elif 700 <= x <= 800 and 200 <= y <= 250:
                                                                 if player.get_isHost() and clicked and press_flag1 == 0:
                                                                     if server.game_reset(room_id):
-                                                                        server.game_end(False,room_id)
-                                                                        server.putColorBack(player.get_color(),room_id)
+                                                                        server.game_end(False, room_id)
+                                                                        server.putColorBack(
+                                                                            player.get_color(), room_id)
                                                                         color = server.get_color(room_id)
                                                                         player.set_color(color)
                                                                         print('Restart')
                                                                     press_flag1 = 1
                                                             if player.get_isHost() == False:
-                                                                server.putColorBack(player.get_color(),room_id)
-                                                                color = server.get_color(room_id)
+                                                                server.putColorBack(
+                                                                    player.get_color(), room_id)
+                                                                color = server.get_color(
+                                                                    room_id)
                                                             if color:
-                                                                player.set_color(color)
+                                                                player.set_color(
+                                                                    color)
                                                             pygame.display.update()
                                     flag = ""
                                     index = 0
@@ -556,15 +567,13 @@ def main():
                                 else:
                                     if index == 0:
                                         if (len(text_username) >= 10):
-                                            player.warming_text(
-                                                "usernameislong")
+                                            player.warming_text("usernameislong")
                                         else:
                                             text_log[index] += event.unicode
                                             text_username += event.unicode
                                     elif index == 1:
                                         if (len(text_password) >= 10):
-                                            player.warming_text(
-                                                "passwordislong")
+                                            player.warming_text("passwordislong")
                                         else:
                                             text_log[index] += '*'
                                             text_password += event.unicode
