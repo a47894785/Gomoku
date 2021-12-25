@@ -29,7 +29,7 @@ class Gomoku:
         # self.reset = False
         # self.winSide = -1
         # self.player = 0
-
+        self.roomChange_flag = False
         self.chess_pos = []
         self.color = []  # 預設list含有white,black
         self.host = []
@@ -49,7 +49,24 @@ class Gomoku:
             list.append(templist)
         return list
 
+    def roomChange(self, bool):
+        self.lock.acquire()
+        self.roomChange_flag = bool
+        self.lock.release()
+        return True
+
+    def get_roomChange(self):
+        flag = self.roomChange_flag
+        return flag
+
+    def exit_room(self, id):
+        self.lock.acquire()
+        self.player[id] -= 1
+        self.lock.release()
+        return True
+
     def add_new_room(self):
+        self.lock.acquire()
         self.chess_pos.append([])
         self.color.append([white, black])
         self.host.append("")
@@ -58,6 +75,7 @@ class Gomoku:
         self.reset.append(False)
         self.winSide.append(int(-1))
         self.player.append(int(0))
+        self.lock.release()
         return True
 
     def chess_reset(self, id):
