@@ -74,11 +74,7 @@ new_dict = {}
 
 
 class Player():
-    def __init__(self, id, name, ip, port):
-        self.id = id
-        self.name = name
-        self.ip = ip
-        self.port = port
+    def __init__(self):
         self.color = []  # 棋子顏色
         self.is_host = False  # 是否為房主
         self.msg = 'normal'
@@ -171,7 +167,7 @@ class Player():
             text = font.render('BLACK WIN', True, black)
         elif side == 1:
             text = font.render('WHITE WIN', True, white)
-        win.blit(text, (670, 400))
+        win.blit(text, (680, 400))
 
     def message(self, situation):
         font = pygame.font.SysFont("", 35)
@@ -228,7 +224,7 @@ def main():
     # room_id = int(sys.argv[2])
     pygame.init()
     # 建立物件
-    player = Player('abcd', sys.argv[2], '127.0.0.1', 8888)
+    player = Player()
     #print('server color list: ' + str(server.get_color_list(room_id)))
     # num = server.set_player(True)
     # if not num:
@@ -572,7 +568,7 @@ def main():
                                                                 if x <= 600:  # 在棋盤範圍內
                                                                     x0, y0 = player.posInfo(x, y)
                                                                     if player.check_pos(x0, y0):
-                                                                        pygame.draw.rect(win, [255, 0, 0], [x0 - 20, y0 - 20, 40, 40], 2, 1)
+                                                                        pygame.draw.rect(win, [177, 211, 232], [x0 - 20, y0 - 20, 40, 40], 2, 1)
 
                                                                 chess_pos = server.get_chess_pos(room_id)  # 取得棋子位置
                                                                 # msg
