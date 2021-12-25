@@ -25,6 +25,8 @@ clicked = False
 press_flag = 0
 press_flag1 = 0
 press_flag2 = 0
+press_flag3 = 0
+press_dropChess = 0
 press_createRoom = 0
 msg_flag = 0
 delay = 50
@@ -217,7 +219,7 @@ class Player():
 
 
 def main():
-    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag, room_id, press_flag2, press_createRoom
+    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag, room_id, press_flag2, press_createRoom, press_dropChess
     if (len(sys.argv) < 2):
         print('Usage: python Gomoku_client.py ServerIP')
         exit(1)
@@ -515,9 +517,13 @@ def main():
                                                         # if not num:
                                                         #     print('Room is full')
                                                         # else:
+                                                            print(server.get_color_list(room_id))
                                                             color = server.get_color(room_id)
                                                             player.set_color(color)
-                                                            # hostID = temp_list[room_id][1]
+                                                            press_flag = 1
+                                                            press_flag1 = 1
+                                                            press_dropChess = 1
+                                                            press_createRoom = 1
                                                             while run:
                                                                 temp_list = server.get_some_information()
                                                                 hostID = temp_list[room_id][1]
@@ -539,7 +545,7 @@ def main():
                                                                         clicked = True
                                                                     elif event.type == MOUSEBUTTONUP:
                                                                         clicked = False
-                                                                        press_flag = 0  # 棋盤上
+                                                                        press_dropChess = 0  # 棋盤上
                                                                         press_flag1 = 0  # Restart
                                                                         press_flag2 = 0  # exit
                                                                 is_host = server.is_host(new_dict["username"], room_id)
@@ -575,7 +581,7 @@ def main():
                                                                     delay -= 1
                                                                 if x <= 600:  # 在棋盤範圍內
                                                                     if not server.is_end(room_id):
-                                                                        if clicked and press_flag == 0:
+                                                                        if clicked and press_dropChess == 0:
                                                                             if player.check_pos(x0, y0):
                                                                                 # 根據棋子顏色判斷是否為我方下棋
                                                                                 if (server.dropChess(x0, y0, player.get_color(), room_id)):
@@ -584,7 +590,7 @@ def main():
                                                                                     msg_flag = 1
                                                                                     delay = 50
                                                                                     print('Cannot drop chess!')
-                                                                            press_flag = 1
+                                                                            press_dropChess = 1
                                                                 # Restart 按鈕
                                                                 elif 700 <= x <= 800 and 430 <= y <= 480:
                                                                     if player.get_isHost() and clicked and press_flag1 == 0 and server.get_player(room_id) == 2:
@@ -599,6 +605,7 @@ def main():
                                                                 # Exit
                                                                 elif 700 <= x <= 800 and 500 <= y <= 550:
                                                                     if clicked and press_flag2 == 0:
+                                                                        server.chess_reset(room_id)
                                                                         quit = server.putColorBack(player.get_color(), room_id)
                                                                         print('Put ' + str(player.get_color()) + ' back.')
                                                                         print(quit)
@@ -607,20 +614,17 @@ def main():
                                                                             player.set_host(False)
                                                                         server.exit_room(room_id)
                                                                         server.roomChange(True)
-                                                                        server.chess_reset(room_id)
                                                                         # server.set_player(False, room_id)
                                                                         win_start.fill(win_color)
                                                                         press_flag2 = 1
                                                                         run = False
+                                                                        continue
 
                                                                 if player.get_isHost() == False:
-                                                                    server.putColorBack(
-                                                                        player.get_color(), room_id)
-                                                                    color = server.get_color(
-                                                                        room_id)
+                                                                    server.putColorBack(player.get_color(), room_id)
+                                                                    color = server.get_color(room_id)
                                                                 if color:
-                                                                    player.set_color(
-                                                                        color)
+                                                                    player.set_color(color)
                                                                 pygame.display.update()
                                         except:
                                             logOut = server.log_out(new_dict)
