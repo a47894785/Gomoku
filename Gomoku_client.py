@@ -62,7 +62,7 @@ rect_create_room = pygame.Rect(650, 400, 200, 80)
 # text
 text_create = ["Create Username:", "Create Password:"]  # 帳號 以及 密碼
 text_log = ["Input Username:", "Input Password:"]
-text_start = ["New User", "Log In", "Exit Game"]
+text_start = ["New User", "Login", "Exit Game"]
 text_warning = ""
 text_username = ""  # 存入帳號
 text_password = ""  # 存入密碼
@@ -600,7 +600,7 @@ def main():
                                                                             press_dropChess = 1
                                                                 # Restart 按鈕
                                                                 elif 700 <= x <= 800 and 430 <= y <= 480:
-                                                                    if player.get_isHost() and clicked and press_flag1 == 0 and server.get_player(room_id) == 2:
+                                                                    if player.get_isHost() and clicked and press_flag1 == 0 and server.get_player(room_id) == 2 and server.is_end(room_id):
                                                                         if server.game_reset(room_id):
                                                                             server.game_end(False, room_id)
                                                                             server.putColorBack(
@@ -635,6 +635,10 @@ def main():
                                                                 pygame.display.update()
                                         except:
                                             logOut = server.log_out(new_dict)
+                                            text_log[0] = "Input Username:"
+                                            text_log[1] = "Input Password:"
+                                            text_username = ""
+                                            text_password = ""
                                     flag = ""
                                     index = 0
                                 press_flag = 1
