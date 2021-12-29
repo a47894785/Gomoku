@@ -19,6 +19,7 @@ black = [0, 0, 0]
 white = [255, 255, 255]
 button_on = [176, 196, 222]
 button_off = [119, 136, 153]
+button_color = [119, 136, 153]
 color = []
 # flags
 clicked = False
@@ -127,7 +128,7 @@ class Player():
         pygame.draw.circle(win, black, [460, 460], 6, 0)
         pygame.draw.circle(win, black, [460, 140], 6, 0)
         if self.is_host:
-            pygame.draw.rect(win, button_on, rect_restart)
+            pygame.draw.rect(win, button_color, rect_restart)
         else:
             pygame.draw.rect(win, button_off, rect_restart)
         pygame.draw.rect(win, button_on, rect_exit)
@@ -172,7 +173,7 @@ class Player():
     def message(self, situation):
         font = pygame.font.SysFont("", 35)
         if situation == "turnError":
-            turnErr = font.render("Cannot drop chess!", True, [220, 182, 128])
+            turnErr = font.render("Cannot drop chess!", True, [255, 0, 0])
         win.blit(turnErr, (633, 220))
 
     def warming_text(self, string):
@@ -215,23 +216,15 @@ class Player():
 
 
 def main():
-    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag, room_id, press_flag2, press_createRoom, press_dropChess
+    global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag, room_id, press_flag2, press_createRoom, press_dropChess, button_color, button_on, button_off
     if (len(sys.argv) < 2):
         print('Usage: python Gomoku_client.py ServerIP')
         exit(1)
     server = xmlrpc.client.ServerProxy('http://' + sys.argv[1] + ':' + str(PORT))
     run = False
-    # room_id = int(sys.argv[2])
     pygame.init()
     # 建立物件
     player = Player()
-    #print('server color list: ' + str(server.get_color_list(room_id)))
-    # num = server.set_player(True)
-    # if not num:
-    #     print('Room is full.')
-    #     sys.exit()
-    # color = server.get_color()
-    # player.set_color(color)
     run_system = True
     run_write = False
     run_room = False
@@ -422,14 +415,12 @@ def main():
                                             pygame.display.update()
                                             room_flag = 0
                                             while(run_room):
-                                                # win_start.fill(win_color)
                                                 clean_room = pygame.Rect(50, 50, 600, 550)
                                                 if server.get_roomChange():
                                                     pygame.draw.rect(win_start, win_color, clean_room)
                                                     time.sleep(0.1)
                                                     server.roomChange(False)
                                                 temp_list = server.get_some_information()
-                                                # print(temp_list)
                                                 # get_some_information()與server抓資料 裡面是好幾個list EX: [ [],[] ....]，而裡面好幾個list裡的資料 都是 第0個為房間人數 第1個為hostname 第2個為房間編號
                                                 x_y_room = []
                                                 # x_y_room 用來儲存 畫房間 每個房間的 編號 y_上界線 y_下界線 人數
@@ -508,15 +499,11 @@ def main():
                                                                         run = True
                                                                         room_id = x_y_room[i][0]
                                                                     else:
-                                                                        # 只在cmd呈現應該要在遊戲畫面呈現
                                                                         print('---Room is full---')
                                                                     break
                                                         press_createRoom = 1
                                                         if run == True:
                                                             num = server.set_player(True, room_id)
-                                                        # if not num:
-                                                        #     print('Room is full')
-                                                        # else:
                                                             print(server.get_color_list(room_id))
                                                             color = server.get_color(room_id)
                                                             player.set_color(color)
@@ -527,7 +514,6 @@ def main():
                                                             while run:
                                                                 temp_list = server.get_some_information()
                                                                 hostID = temp_list[room_id][1]
-                                                                # print(temp_list[room_id])
                                                                 for event in pygame.event.get():
                                                                     if event.type == QUIT:
                                                                         quit = server.putColorBack(player.get_color(), room_id)
@@ -539,9 +525,6 @@ def main():
                                                                         print("---------> player : %d" % (server.get_player(room_id)))
                                                                         server.set_player(False, room_id)
                                                                         chessReset = server.chess_reset(room_id)
-                                                                        # server.exit_room(room_id)
-                                                                        # server.roomChange(True)
-                                                                        logOut = server.log_out(new_dict)
                                                                         win_start.fill(win_color)
                                                                         pygame.display.update()
                                                                         run = False
@@ -557,7 +540,6 @@ def main():
                                                                     continue
                                                                 is_host = server.is_host(new_dict["username"], room_id)
                                                                 player.set_host(is_host)
-                                                                # print('roomHost ======> %s' % (temp_list[room_id][1]))
                                                                 player.drawChessBoard(new_dict, hostID)  # 繪製棋盤
                                                                 chess_pos = server.get_chess_pos(room_id)  # 取得棋子位置
                                                                 player.drawChess()  # 繪製棋子
@@ -572,6 +554,7 @@ def main():
                                                                         print('White Win')
                                                                     if is_host:  # 若是房主則向伺服器請求將棋局結束
                                                                         server.game_end(True, room_id)
+                                                                        button_color = button_on
                                                                 if winSide != -1:
                                                                     player.printWin(winSide)
                                                                 # 取得滑鼠座標
@@ -607,6 +590,7 @@ def main():
                                                                                 player.get_color(), room_id)
                                                                             color = server.get_color(room_id)
                                                                             player.set_color(color)
+                                                                            button_color = button_off
                                                                             print('Restart')
                                                                         press_flag1 = 1
                                                                 # Exit
