@@ -1,12 +1,11 @@
-from os import name
 from sys import setswitchinterval
 from xmlrpc.server import SimpleXMLRPCServer
 from socketserver import ThreadingMixIn
-import time
 import threading
 import numpy as np
 import random
 from flask import Flask, json, request, jsonify
+
 PORT = 8888
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -21,17 +20,9 @@ class ThreadXMLRPCServer(ThreadingMixIn, SimpleXMLRPCServer):
 class Gomoku:
     def __init__(self):
         self.lock = threading.Lock()
-        # self.chess_pos = []
-        # self.color = [white, black]  # 預設list含有white,black
-        # self.host = ''
-        # self.have_host = False
-        # self.end = False
-        # self.reset = False
-        # self.winSide = -1
-        # self.player = 0
         self.roomChange_flag = False
         self.chess_pos = []
-        self.color = []  # 預設list含有white,black
+        self.color = []
         self.host = []
         self.have_host = []
         self.end = []

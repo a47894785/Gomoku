@@ -1,13 +1,10 @@
-from typing import Text
 import pygame
 import sys
-import numpy as np
 import time
 from pygame.event import wait
 from pygame.font import SysFont
 from pygame.locals import *
 import xmlrpc.client
-import os
 
 PORT = 8888
 # 視窗長寬
