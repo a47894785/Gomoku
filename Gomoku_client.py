@@ -6,7 +6,7 @@ from pygame.font import SysFont
 from pygame.locals import *
 import xmlrpc.client
 
-PORT = 8888
+PORT = 12345
 # 視窗長寬
 width = 900
 height = 600
@@ -513,6 +513,7 @@ def main():
                                                                 hostID = temp_list[room_id][1]
                                                                 for event in pygame.event.get():
                                                                     if event.type == QUIT:
+                                                                        server.chess_reset(room_id)
                                                                         quit = server.putColorBack(player.get_color(), room_id)
                                                                         print('Put ' + str(player.get_color()) + ' back.')
                                                                         print(quit)
@@ -520,8 +521,9 @@ def main():
                                                                             server.set_host_false(room_id)
                                                                             player.set_host(False)
                                                                         print("---------> player : %d" % (server.get_player(room_id)))
-                                                                        server.set_player(False, room_id)
-                                                                        chessReset = server.chess_reset(room_id)
+                                                                        #server.set_player(False, room_id)
+                                                                        server.exit_room(room_id)
+                                                                        server.roomChange(True)
                                                                         win_start.fill(win_color)
                                                                         pygame.display.update()
                                                                         run = False
@@ -602,7 +604,6 @@ def main():
                                                                             player.set_host(False)
                                                                         server.exit_room(room_id)
                                                                         server.roomChange(True)
-                                                                        # server.set_player(False, room_id)
                                                                         win_start.fill(win_color)
                                                                         press_flag2 = 1
                                                                         run = False

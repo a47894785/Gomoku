@@ -6,7 +6,7 @@ import numpy as np
 import random
 from flask import Flask, json, request, jsonify
 
-PORT = 8888
+PORT = 12345
 white = [255, 255, 255]
 black = [0, 0, 0]
 FILE1 = 'people.json'
@@ -370,7 +370,7 @@ def main():
     with open(FILE1) as fp1:
         ARR1 = json.load(fp1)
     obj = Gomoku()
-    server = ThreadXMLRPCServer(('', PORT))
+    server = ThreadXMLRPCServer(('127.0.0.1', PORT))
     server.register_instance(obj)
     print('Listening on port %d' % (PORT))
     try:
