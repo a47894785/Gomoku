@@ -6,7 +6,7 @@ from pygame.font import SysFont
 from pygame.locals import *
 import xmlrpc.client
 
-PORT = 12345
+PORT = 15200
 # 視窗長寬
 width = 900
 height = 600
@@ -615,12 +615,13 @@ def main():
                                                                 if color:
                                                                     player.set_color(color)
                                                                 pygame.display.update()
-                                        except:
+                                        except ConnectionError:
                                             logOut = server.log_out(new_dict)
                                             text_log[0] = "Input Username:"
                                             text_log[1] = "Input Password:"
                                             text_username = ""
                                             text_password = ""
+                                            time.sleep(3)
                                     flag = ""
                                     index = 0
                                 press_flag = 1
