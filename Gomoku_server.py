@@ -377,6 +377,11 @@ def main():
         print('Use Control-C to exit!')
         server.serve_forever()
     except KeyboardInterrupt:
+        for i in range(len(ARR1)):
+            if ARR1[i]['login'] == 'Y':
+                ARR1[i]['login'] = 'N'
+        with open(FILE1, 'w') as wfp1:
+            json.dump(ARR1, wfp1)
         print('Server exit')
 
 
