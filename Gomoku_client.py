@@ -6,7 +6,7 @@ from pygame.font import SysFont
 from pygame.locals import *
 import xmlrpc.client
 
-PORT = 15200
+PORT = 9999
 # 視窗長寬
 width = 900
 height = 600
@@ -214,10 +214,10 @@ class Player():
 
 def main():
     global chess_pos, clicked, press_flag, color, press_flag1, delay, msg_flag, room_id, press_flag2, press_createRoom, press_dropChess, button_color, button_on, button_off
-    if (len(sys.argv) < 2):
-        print('Usage: python Gomoku_client.py ServerIP')
-        exit(1)
-    server = xmlrpc.client.ServerProxy('http://' + sys.argv[1] + ':' + str(PORT))
+    # if (len(sys.argv) < 2):
+    #     print('Usage: python Gomoku_client.py ServerIP')
+    #     exit(1)
+    server = xmlrpc.client.ServerProxy('http://' + '127.0.0.1' + ':' + str(PORT))
     run = False
     pygame.init()
     # 建立物件
@@ -496,12 +496,13 @@ def main():
                                                                         run = True
                                                                         room_id = x_y_room[i][0]
                                                                     else:
-                                                                        print('---Room is full---')
+                                                                        pass
+                                                                       # print('---Room is full---')
                                                                     break
                                                         press_createRoom = 1
                                                         if run == True:
                                                             num = server.set_player(True, room_id)
-                                                            print(server.get_color_list(room_id))
+                                                            # print(server.get_color_list(room_id))
                                                             color = server.get_color(room_id)
                                                             player.set_color(color)
                                                             press_flag = 1
@@ -515,12 +516,12 @@ def main():
                                                                     if event.type == QUIT:
                                                                         server.chess_reset(room_id)
                                                                         quit = server.putColorBack(player.get_color(), room_id)
-                                                                        print('Put ' + str(player.get_color()) + ' back.')
-                                                                        print(quit)
+                                                                        #print('Put ' + str(player.get_color()) + ' back.')
+                                                                        # print(quit)
                                                                         if player.get_isHost():
                                                                             server.set_host_false(room_id)
                                                                             player.set_host(False)
-                                                                        print("---------> player : %d" % (server.get_player(room_id)))
+                                                                        #print("---------> player : %d" % (server.get_player(room_id)))
                                                                         #server.set_player(False, room_id)
                                                                         server.exit_room(room_id)
                                                                         server.roomChange(True)
@@ -548,9 +549,11 @@ def main():
                                                                 # 若有一方勝利且棋局尚未結束，先將棋局結束後印出勝利方
                                                                 if winSide != -1 and not server.is_end(room_id):
                                                                     if winSide == 0:
-                                                                        print('Black Win')
+                                                                        pass
+                                                                        #print('Black Win')
                                                                     else:
-                                                                        print('White Win')
+                                                                        pass
+                                                                        #print('White Win')
                                                                     if is_host:  # 若是房主則向伺服器請求將棋局結束
                                                                         server.game_end(True, room_id)
                                                                         button_color = button_on
@@ -574,11 +577,12 @@ def main():
                                                                             if player.check_pos(x0, y0):
                                                                                 # 根據棋子顏色判斷是否為我方下棋
                                                                                 if (server.dropChess(x0, y0, player.get_color(), room_id)):
-                                                                                    print('Drop chess in [%d, %d]' % (x0, y0))
+                                                                                    pass
+                                                                                    #print('Drop chess in [%d, %d]' % (x0, y0))
                                                                                 else:
                                                                                     msg_flag = 1
                                                                                     delay = 50
-                                                                                    print('Cannot drop chess!')
+                                                                                    #print('Cannot drop chess!')
                                                                             press_dropChess = 1
                                                                 # Restart 按鈕
                                                                 elif 700 <= x <= 800 and 430 <= y <= 480:
@@ -590,15 +594,15 @@ def main():
                                                                             color = server.get_color(room_id)
                                                                             player.set_color(color)
                                                                             button_color = button_off
-                                                                            print('Restart')
+                                                                            # print('Restart')
                                                                         press_flag1 = 1
                                                                 # Exit
                                                                 elif 700 <= x <= 800 and 500 <= y <= 550:
                                                                     if clicked and press_flag2 == 0:
                                                                         server.chess_reset(room_id)
                                                                         quit = server.putColorBack(player.get_color(), room_id)
-                                                                        print('Put ' + str(player.get_color()) + ' back.')
-                                                                        print(quit)
+                                                                        #print('Put ' + str(player.get_color()) + ' back.')
+                                                                        # print(quit)
                                                                         if player.get_isHost():
                                                                             server.set_host_false(room_id)
                                                                             player.set_host(False)

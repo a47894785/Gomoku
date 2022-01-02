@@ -6,7 +6,7 @@ import numpy as np
 import random
 from flask import Flask, json, request, jsonify
 
-PORT = 15200
+PORT = 9999
 white = [255, 255, 255]
 black = [0, 0, 0]
 FILE1 = 'people.json'
